@@ -52,7 +52,12 @@ func ReadFile(path string, start time.Time, end time.Time) ([]BP, error) {
 			return nil, err
 		}
 
+		if start.After(stamp) || end.Before(stamp) {
+			continue
+		}
+
 		r = append(r, BP{Stamp: stamp, Systolic: systolic, Diastolic: diastolic, Pulse: pulse})
+
 	}
 
 	return r, nil
@@ -60,9 +65,9 @@ func ReadFile(path string, start time.Time, end time.Time) ([]BP, error) {
 
 func toTime(dateString string, timeString string) (time.Time, error) {
 	dateTime := fmt.Sprintf("%s %s", dateString, timeString)
-	stamp, err := time.Parse("Jan 2 2026 03:04 PM", dateTime)
+	stamp, err := time.Parse("Jan 2 2006 03:04 pm", dateTime)
 	if err != nil {
-		return time.Time{}, fmt.Errorf("failed to parse %s as timestamp", dateTime)
+		return time.Time{}, fmt.Errorf("failed to parse %s as timestamp; %v", dateTime, err)
 	}
 	return stamp, nil
 }
